@@ -16,4 +16,4 @@ default/*.elf
 *.map
 *.eep
 *.lss
-*.aps
+

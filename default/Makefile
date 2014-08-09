@@ -1,12 +1,12 @@
 ###############################################################################
-# Makefile for the project DemoSoft
+# Makefile for the project modio
 ###############################################################################
 
 ## General Flags
-PROJECT = DemoSoft
+PROJECT = modio
 MCU = atmega16
-TARGET = DemoSoft.elf
-CC = avr-gcc
+TARGET = modio.elf
+CC = 
 
 CPP = avr-g++
 
@@ -25,7 +25,7 @@ ASMFLAGS += -x assembler-with-cpp -Wa,-gdwarf2
 
 ## Linker flags
 LDFLAGS = $(COMMON)
-LDFLAGS +=  -Wl,-Map=DemoSoft.map
+LDFLAGS +=  -Wl,-Map=modio.map
 
 
 ## Intel Hex file production flags
@@ -37,19 +37,17 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 
 
 ## Objects that must be built in order to link
-OBJECTS = DemoSoft.o AnalogINs.o DigitalINs.o DigitalOUTs.o I2C_FSM.o I2CAddress.o 
+OBJECTS = AnalogINs.o DemoSoft.o DigitalINs.o DigitalOUTs.o I2C_FSM.o I2CAddress.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
 
 ## Build
-all: $(TARGET) DemoSoft.hex DemoSoft.eep DemoSoft.lss size
-
-## Compile
-DemoSoft.o: ../DemoSoft.c
+all: $(TARGET) modio.hex modio.eep modio.lss## Compile
+AnalogINs.o: ../AnalogINs.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
-AnalogINs.o: ../AnalogINs.c
+DemoSoft.o: ../DemoSoft.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 DigitalINs.o: ../DigitalINs.c
@@ -77,14 +75,10 @@ $(TARGET): $(OBJECTS)
 %.lss: $(TARGET)
 	avr-objdump -h -S $< > $@
 
-size: ${TARGET}
-	@echo
-	@avr-size -C --mcu=${MCU} ${TARGET}
-
 ## Clean target
 .PHONY: clean
 clean:
-	-rm -rf $(OBJECTS) DemoSoft.elf dep/* DemoSoft.hex DemoSoft.eep DemoSoft.lss DemoSoft.map
+	-rm -rf $(OBJECTS) modio.elf dep/* modio.hex modio.eep modio.lss modio.map
 
 
 ## Other dependencies

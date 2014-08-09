@@ -80,7 +80,7 @@ int main(void)
 		// toggle LED to indicate activity
 		if( (delay--) == 0 ) {
 			delay = 200000;
-			ToggleLED();
+			//ToggleLED();
 		}			
     }
 }

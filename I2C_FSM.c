@@ -60,7 +60,7 @@ static char readCommandRequested;
 static uint32_t addressUpdatedIndTimeout;
 static uint8_t txBuf[TX_BUF_LENGTH];
 static uint8_t txBufIndex;
-
+static uint8_t lastInputState;
 static I2C_FSM_STATES i2c_state;
 
 /* DECLARE EXTERNAL VARIABLES HERE */
@@ -87,7 +87,9 @@ char I2C_FSM_Initialize(void)
 
 	readCommandRequested = 0;
 	addressUpdatedIndTimeout = 0;
+	lastInputState = DINs_Get();
 	
+
 	return 0;
 }
 
@@ -99,7 +101,9 @@ char I2C_FSM_Initialize(void)
 *******************************************************************************/
 void I2C_FSM_Refresh(void)
 {
+	alterRelayState();
 	if(readCommandRequested) {
+		ToggleLED();
 		switch(i2c_command) {
 			case I2C_GET_DINPUTS:
 				txBuf[0] = DINs_Get();
@@ -129,6 +133,22 @@ void I2C_FSM_Refresh(void)
 	}
 }
 
+void alterRelayState(){
+	uint8_t currentInputState=0;
+	uint8_t outState=0;
+	
+	currentInputState = DINs_Get();
+	
+	if(currentInputState != lastInputState){
+		outState=DOUTs_Get();
+	
+		outState = outState ^ (currentInputState ^ lastInputState);
+
+		DOUTs_Set(outState);
+		lastInputState = currentInputState;
+	}
+
+}
 
 ISR(TWI_vect)
 {
@@ -169,6 +189,7 @@ ISR(TWI_vect)
 					break;
 					
 				case I2C_FSM_WAIT_DOUTS:
+					ToggleLED();
 					DOUTs_Set(TWDR);
 					i2c_state = I2C_FSM_WAIT_DUMMY;
 					break;
